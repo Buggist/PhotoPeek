@@ -28,7 +28,7 @@ import pygame
 #----主配置--
 window_size = (1280, 720)
 caption     = '照片看看器'
-icon_file   = r'data\icon_128.png'
+icon_file   = r'data\Framed Picture.png'
 # 设置窗口的背景颜色
 background_color = (240, 240, 245)  # 偏蓝一点更符合视觉习惯，纯灰色看起来偏黄
 
@@ -48,9 +48,6 @@ def main():
     dragging = False
     
     file_path = ""
-    
-    # 缩放级别
-    scale_level = [1]
     
     # 创建窗口，设置窗口的大小和标题
     screen = pygame.display.set_mode(size=window_size, flags=pygame.RESIZABLE)
@@ -91,6 +88,8 @@ def main():
     # 当前图片
     if arg:
         # 图片加载
+        scale_level = [1]   # 缩放级别
+        
         file_path = arg
         
         image = pygame.image.load(file_path)
@@ -172,6 +171,9 @@ def main():
                     if index == len(image_files) - 1:
                          continue
                     else:
+                        # 图片加载
+                        scale_level = [1]   # 缩放级别
+                        
                         file_path = image_files[index+1]
                         
                         image = pygame.image.load(file_path)
@@ -194,6 +196,9 @@ def main():
                     if index == 0:
                          continue
                     else:
+                        # 图片加载
+                        scale_level = [1]   # 缩放级别
+                        
                         file_path = image_files[index-1]
                         
                         image = pygame.image.load(file_path)
@@ -214,7 +219,11 @@ def main():
                     print("按下A")
                     
                     if image:
-                        image_show = rotate_image(image_show, -90)
+                        
+                        image = rotate_image(image, -90)
+
+                        image_show = scale_image_tofit_screen(screen, image)
+                        render_pos = get_renderpos(screen, image_show)
                         
                         screen.fill(background_color)
                         screen.blit(image_show, render_pos)
@@ -223,7 +232,11 @@ def main():
                     print("按下D")
                     
                     if image:
-                        image_show = rotate_image(image_show, 90)
+
+                        image = rotate_image(image, 90)
+
+                        image_show = scale_image_tofit_screen(screen, image)
+                        render_pos = get_renderpos(screen, image_show)
                         
                         screen.fill(background_color)
                         screen.blit(image_show, render_pos)
@@ -236,6 +249,8 @@ def main():
                 file_path = event.file
                 
                 # 图片加载
+                scale_level = [1]   # 缩放级别
+                
                 image = pygame.image.load(file_path)
                 
                 print(image.get_size())
@@ -251,7 +266,15 @@ def main():
                 
                 caption_new = update_caption(caption, file_path)
                 pygame.display.set_caption(caption_new)
+
+            elif event.type == pygame.VIDEORESIZE:
+
+                # 窗口尺寸变化时重新调整图片尺寸，重绘窗口
+                image_show = scale_image_tofit_screen(screen, image)
+                render_pos = get_renderpos(screen, image_show)
                 
+                screen.fill(background_color)
+                screen.blit(image_show, render_pos)
                 
                 
 
